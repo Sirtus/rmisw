@@ -1,9 +1,9 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#define A_ROWS 4
-#define A_COLS 2
-#define B_COLS 5
+#define A_ROWS 3
+#define A_COLS 3
+#define B_COLS 3
 
 typedef struct Matrix {
     int** values;
@@ -39,8 +39,6 @@ void printMatrix(Matrix matrix) {
         for(int j = 0; j < matrix.cols; ++j) {
             if (j != matrix.cols-1) printf("%5d, ", matrix.values[i][j]);
             else printf("%5d", matrix.values[i][j]);
-            
-            
         }
         printf("]\n");
     }
@@ -54,17 +52,15 @@ int main() {
     const int c_rows = a_rows;
     const int c_cols = b_cols;
 
-
-    int a[A_ROWS][A_COLS] = {
-        {2, 1},
-        {3, 2},
-        {2, 4},
-        {5, 1}
+    int a[3][3] = {
+        {9, 3, 9},
+        {5, 8, 2},
+        {5, 6, 2}
     };
-
-    int b[A_COLS][B_COLS] = {
-        {2, 3, 4, 1, 0},
-        {3, 2, 4, 3, 1}
+    int b[3][3] = {
+        {2, 8, 3},
+        {8, 9, 1},
+        {3, 9, 5}
     };
 
     int** A = calloc(a_rows, sizeof(int*));
