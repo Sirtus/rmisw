@@ -1,9 +1,9 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#define A_ROWS 4
-#define A_COLS 2
-#define B_COLS 5
+#define A_ROWS 3
+#define A_COLS 3
+#define B_COLS 3
 
 int** classic(int** A, int** B, int a_rows, int a_cols, int b_cols) {
     int** C = calloc(a_rows, sizeof(int*));
@@ -20,7 +20,7 @@ int** classic(int** A, int** B, int a_rows, int a_cols, int b_cols) {
             sum = 0;
         }
     }
-    
+
     return C;
 } 
 
@@ -30,8 +30,6 @@ void printMatrix(int** matrix, int n_rows, int n_cols) {
         for(int j = 0; j < n_cols; ++j) {
             if (j != n_cols-1) printf("%5d, ", matrix[i][j]);
             else printf("%5d", matrix[i][j]);
-            
-            
         }
         printf("]\n");
     }
@@ -46,17 +44,19 @@ int main() {
     const int c_cols = b_cols;
 
 
-    int a[A_ROWS][A_COLS] = {
-        {2, 1},
-        {3, 2},
-        {2, 4},
-        {5, 1}
+    int a[3][3] = {
+        {3, 2, 9},
+        {8, 4, 7},
+        {1, 3, 7}
+    };
+    int b[3][3] = {
+        {4, 2, 5},
+        {8, 3, 4},
+        {4, 5, 1}
     };
 
-    int b[A_COLS][B_COLS] = {
-        {2, 3, 4, 1, 0},
-        {3, 2, 4, 3, 1}
-    };
+
+
 
     int** A = calloc(a_rows, sizeof(int*));
     for(int i = 0; i < a_rows; ++i) {
