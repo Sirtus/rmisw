@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include "input_matrix.h"
 
 #define A_ROWS 4
 #define A_COLS 2
@@ -8,7 +9,7 @@
 
 typedef struct Matrix
 {
-    int **values;
+    float **values;
     int rows;
     int cols;
 } Matrix;
@@ -28,9 +29,9 @@ void printMatrix(Matrix matrix)
         for (int j = 0; j < matrix.cols; ++j)
         {
             if (j != matrix.cols - 1)
-                printf("%5d, ", matrix.values[i][j]);
+                printf("%f, ", matrix.values[i][j]);
             else
-                printf("%5d", matrix.values[i][j]);
+                printf("%f", matrix.values[i][j]);
         }
         printf("]\n");
     }
@@ -38,12 +39,12 @@ void printMatrix(Matrix matrix)
 
 Matrix classic(Matrix A, Matrix B)
 {
-    int **C = calloc(A.rows, sizeof(int *));
+    float **C = calloc(A.rows, sizeof(float *));
 
     for (int i = 0; i < A.rows; ++i)
-        C[i] = calloc(B.cols, sizeof(int));
+        C[i] = calloc(B.cols, sizeof(float));
 
-    int sum = 0;
+    float sum = 0;
     for (int i = 0; i < A.rows; ++i)
     {
         for (int j = 0; j < B.cols; ++j)
@@ -63,7 +64,7 @@ Matrix classic(Matrix A, Matrix B)
 
 void classic_(Matrix A, Matrix B, Matrix C, Slice a, Slice b, Slice c)
 {
-    int sum = 0;
+    float sum = 0;
     for (int i = 0; i < c.size; ++i)
     {
         for (int j = 0; j < c.size; ++j)
@@ -126,9 +127,9 @@ void multiply_rec(Matrix A, Matrix B, Matrix C, Slice a, Slice b, Slice c)
 
 Matrix multiply(Matrix A, Matrix B)
 {
-    int **C = calloc(A.rows, sizeof(int *));
+    float **C = calloc(A.rows, sizeof(float *));
     for (int i = 0; i < A.rows; ++i)
-        C[i] = calloc(B.cols, sizeof(int));
+        C[i] = calloc(B.cols, sizeof(float));
     Matrix M = {.values = C, .rows = A.rows, .cols = B.cols};
     Slice initial = {.rs = 0, .cs = 0, .size = A.rows};
 
@@ -146,47 +147,10 @@ void free_matrix(Matrix M)
 
 int main()
 {
-    const int N = 16;
-
-    int a[16][16] = {
-        {1, 3, 1, 7, 1, 8, 8, 8, 4, 1, 4, 5, 2, 1, 1, 2},
-        {1, 9, 5, 6, 5, 3, 7, 3, 1, 1, 5, 2, 9, 5, 9, 1},
-        {8, 5, 1, 4, 2, 7, 8, 9, 5, 8, 5, 8, 6, 8, 5, 7},
-        {1, 7, 4, 4, 8, 5, 3, 9, 8, 1, 6, 8, 6, 4, 9, 3},
-        {9, 1, 2, 1, 9, 1, 6, 2, 2, 7, 7, 5, 5, 9, 3, 2},
-        {8, 8, 5, 5, 5, 3, 8, 2, 9, 4, 1, 1, 1, 5, 8, 7},
-        {7, 1, 2, 6, 5, 1, 7, 5, 4, 2, 8, 6, 4, 1, 8, 8},
-        {3, 1, 6, 5, 1, 3, 5, 5, 5, 4, 7, 4, 2, 1, 2, 7},
-        {7, 8, 1, 5, 7, 7, 9, 4, 1, 3, 9, 1, 8, 4, 3, 2},
-        {5, 6, 7, 5, 2, 1, 2, 5, 8, 4, 9, 7, 2, 4, 3, 3},
-        {3, 8, 1, 9, 7, 6, 6, 7, 5, 5, 2, 3, 3, 2, 7, 5},
-        {2, 7, 4, 5, 9, 2, 6, 3, 9, 2, 8, 8, 6, 3, 6, 9},
-        {9, 7, 6, 1, 6, 4, 9, 8, 7, 3, 6, 8, 5, 5, 9, 6},
-        {2, 4, 8, 2, 6, 3, 7, 5, 2, 9, 9, 4, 4, 7, 4, 5},
-        {8, 1, 9, 4, 5, 8, 7, 2, 5, 1, 2, 9, 7, 7, 4, 6},
-        {3, 7, 8, 9, 3, 2, 7, 7, 7, 8, 8, 1, 4, 3, 3, 8}};
-    int b[16][16] = {
-        {2, 3, 4, 4, 3, 5, 6, 7, 9, 5, 6, 4, 2, 1, 7, 5},
-        {4, 3, 5, 3, 9, 8, 2, 7, 3, 1, 2, 8, 4, 5, 7, 3},
-        {7, 5, 5, 3, 8, 5, 4, 5, 7, 6, 9, 4, 4, 6, 6, 1},
-        {9, 3, 6, 7, 2, 1, 1, 6, 6, 3, 2, 1, 5, 8, 7, 6},
-        {2, 2, 3, 7, 4, 7, 3, 5, 7, 5, 4, 1, 6, 8, 5, 5},
-        {5, 1, 4, 6, 7, 7, 1, 4, 9, 5, 3, 8, 5, 6, 6, 6},
-        {5, 4, 1, 2, 4, 7, 1, 3, 2, 1, 2, 5, 3, 1, 5, 4},
-        {5, 7, 6, 9, 8, 7, 4, 2, 5, 7, 5, 7, 1, 1, 5, 1},
-        {2, 4, 6, 9, 2, 9, 9, 3, 8, 5, 3, 4, 3, 6, 4, 9},
-        {2, 6, 5, 8, 9, 5, 4, 4, 7, 1, 7, 6, 5, 3, 5, 2},
-        {6, 6, 3, 9, 9, 8, 1, 3, 9, 9, 6, 2, 4, 2, 9, 5},
-        {2, 1, 9, 4, 3, 4, 8, 8, 7, 7, 7, 1, 8, 4, 7, 2},
-        {2, 2, 7, 5, 3, 7, 5, 5, 7, 9, 7, 4, 7, 7, 1, 7},
-        {5, 7, 3, 2, 3, 6, 6, 2, 1, 1, 7, 7, 2, 5, 6, 8},
-        {9, 2, 5, 7, 2, 4, 2, 1, 7, 5, 7, 2, 5, 3, 1, 5},
-        {8, 4, 4, 4, 1, 9, 6, 1, 3, 9, 9, 8, 7, 4, 4, 3}};
-
-    int **A = calloc(N, sizeof(int *));
+    float **A = calloc(N, sizeof(float *));
     for (int i = 0; i < N; ++i)
     {
-        A[i] = calloc(N, sizeof(int));
+        A[i] = calloc(N, sizeof(float));
         for (int j = 0; j < N; ++j)
             A[i][j] = a[i][j];
     }
@@ -195,10 +159,10 @@ int main()
     printf("Matrix A:\n");
     printMatrix(M1);
 
-    int **B = calloc(N, sizeof(int *));
+    float **B = calloc(N, sizeof(float *));
     for (int i = 0; i < N; ++i)
     {
-        B[i] = calloc(N, sizeof(int));
+        B[i] = calloc(N, sizeof(float));
         for (int j = 0; j < N; ++j)
             B[i][j] = b[i][j];
     }
