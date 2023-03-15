@@ -24,7 +24,6 @@ int** classic(int** A, int** B, int a_rows, int a_cols, int b_cols) {
     return C;
 } 
 
-
 void printMatrix(int** matrix, int n_rows, int n_cols) {
     for(int i = 0; i < n_rows; ++i) {
         printf("[");
