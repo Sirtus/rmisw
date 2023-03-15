@@ -6,7 +6,7 @@ N = 3
 def generate_C_code(matrix, name):
     s = 'int ' + name + '[' + str(N) + '][' + str(N) + '] = {\n'
     for row  in matrix:
-        s += '  {'
+        s += '    {'
         for x in row:
             s += str(x) + ', '
         s = s[:-2]
