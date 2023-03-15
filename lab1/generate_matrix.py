@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-N = 3
+N = 16
 
 def generate_c_code(matrix, name):
     s = 'int ' + name + '[' + str(N) + '][' + str(N) + '] = {\n'
