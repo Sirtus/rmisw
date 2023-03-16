@@ -1,10 +1,8 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include "time.h"
 #include "input_matrix.h"
 
-#define A_ROWS 4
-#define A_COLS 2
-#define B_COLS 5
 #define SIZE_THRESH 2
 
 typedef struct Matrix
@@ -20,6 +18,9 @@ typedef struct Slice
     int cs;
     int size;
 } Slice; // [rs: rs + size, cs: cs + size]
+
+int float_mult = 0;
+int float_add = 0;
 
 void printMatrix(Matrix matrix)
 {
@@ -52,7 +53,10 @@ Matrix classic(Matrix A, Matrix B)
             for (int k = 0; k < A.cols; ++k)
             {
                 sum += A.values[i][k] * B.values[k][j];
+                float_add +=  1;
+                float_mult += 1;
             }
+            float_add -= 1;
             C[i][j] = sum;
             sum = 0;
         }
@@ -72,7 +76,10 @@ void classic_(Matrix A, Matrix B, Matrix C, Slice a, Slice b, Slice c)
             for (int k = 0; k < c.size; ++k)
             {
                 sum += A.values[i + a.rs][k + a.cs] * B.values[k + b.rs][j + b.cs];
+                float_mult += 1;
+                float_add += 1;
             }
+            float_add -= 1;
             // we are adding inplace, so assume partial sum was already there
             C.values[i + c.rs][j + c.cs] += sum;
             sum = 0;
@@ -147,6 +154,9 @@ void free_matrix(Matrix M)
 
 int main()
 {
+    clock_t start, end;
+    double cpu_time_used;
+
     float **A = calloc(N, sizeof(float *));
     for (int i = 0; i < N; ++i)
     {
@@ -157,7 +167,7 @@ int main()
     Matrix M1 = {.values = A, .rows = N, .cols = N};
 
     printf("Matrix A:\n");
-    printMatrix(M1);
+    // printMatrix(M1);
 
     float **B = calloc(N, sizeof(float *));
     for (int i = 0; i < N; ++i)
@@ -168,11 +178,20 @@ int main()
     }
     Matrix M2 = {.values = B, .rows = N, .cols = N};
     printf("Matrix B:\n");
-    printMatrix(M2);
+    // printMatrix(M2);
 
     printf("Matrix C = AB:\n");
+    start = clock();
     Matrix C = multiply(M1, M2);
-    printMatrix(C);
+    // Matrix C = classic(M1, M2);
+    end = clock();
+    // printMatrix(C);
+
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("\nTIME: %f\n", cpu_time_used);
+    printf("\nFLOAT ADDITIONS:       %d\n", float_add);
+    printf("\nFLOAT MULTIPLICATIONS: %d\n", float_mult);
+
 
     free_matrix(M1);
     free_matrix(M2);

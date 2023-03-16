@@ -13,7 +13,6 @@ def generate_c_code(matrix, name):
         s += '},\n'
     s = s[:-2]
     s += '\n};'
-    print(s)
     return s
 
 s = 'const int N = ' + str(N) + ';\n\n'

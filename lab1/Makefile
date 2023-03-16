@@ -9,3 +9,7 @@ ifndef N
 else
 	python3 generate_matrix.py $(N)
 endif
+
+all:
+	$(MAKE) gen_matrix
+	$(MAKE) compute
