@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 
-path <- "/home/sirtus/Univ/macierze/p2/rmisw/stat/AmesHousing.csv"
+path <- "./AmesHousing.csv"
 
 data <- read.csv(path)
 ```
