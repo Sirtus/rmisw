@@ -10,43 +10,35 @@ path <- "./AmesHousing.csv"
 data <- read.csv(path)
 ```
 
-
 ```{r}
 
 head(data)
 ```
 
-
 ```{r}
 names(data)
 ```
 
-
 ```{r}
 dim(data)
 ```
-
 
 ```{r}
 df <- data[, c("Year.Built", "Roof.Style", "Utilities", "Street", "Full.Bath", "Half.Bath", "Bedroom.AbvGr", "Kitchen.AbvGr", "Garage.Area", "Paved.Drive", "Sale.Condition", "SalePrice", "Yr.Sold", "Garage.Cars", "Heating", "Electrical", "Exterior.1st", "Exterior.2nd", "Overall.Qual", "Central.Air")]
 
 ```
 
-
 ```{r}
 df
 ```
-
 
 ```{r}
 dim(df)
 ```
 
-
 ```{r}
 names(df)
 ```
-
 
 Prosta regresja liniowa
 
@@ -55,7 +47,6 @@ fit_simple <- lm(df$SalePrice ~ df$Overall.Qual)
 
 coef(fit_simple)
 ```
-
 
 ```{r}
 summaryList <- summary(fit_simple)
@@ -74,32 +65,28 @@ Model jest statystycznie istotny. Overall.Qual ma wpływ na cenę sprzedaży dom
 confint(fit_simple)
 ```
 
-
 ```{r}
 predict(fit_simple, newdata=data.frame(OverallQual = c(5, 6, 7)), interval = "confidence")
 ```
 
-
 ```{r}
 predict(fit_simple, newdata=data.frame(OverallQual = c(5, 6, 7)), interval = "prediction")
 ```
-
 
 ```{r}
 plot(df$Year.Built, df$SalePrice)
 abline(fit_simple)
 ```
 
-
 ```{r}
 plot(fit_simple)
 ```
-
 
 ```{r}
 plot(hatvalues(fit_simple))
 which.max(hatvalues(fit_simple))
 ```
+
 Regresja Wielokrotna
 
 ```{r}
@@ -107,14 +94,12 @@ fit_all <- lm(SalePrice ~ ., data = df)
 summary(fit_all)
 ```
 
-
 ```{r}
 library(ellipse)
 plot(ellipse(fit_all, which = -1), type = "l")
 la_coefs <- coef(fit_all)
 points(la_coefs[2], la_coefs[3])
 ```
-
 
 ```{r}
 names(data)
@@ -139,11 +124,9 @@ for (i in 1:length(counters)) {
 df$Central.AirT <- ifelse(df$Central.Air == "Y", 1, 0)
 ```
 
-
 ```{r}
 names(df)
 ```
-
 
 ```{r}
 dir_logistic <- list()
@@ -153,39 +136,34 @@ dir_logistic$fit <-  glm(Central.AirT ~ Overall.Qual, data=df, family=binomial)
 summary(dir_logistic$fit)
 ```
 
-
 ```{r}
 dir_logistic$probs <- predict(dir_logistic$fit, type = "response")
 head(dir_logistic$probs)
 ```
 
-
 ```{r}
 dir_logistic$predicted <- ifelse(dir_logistic$probs > 0.5, "Y", "N")
 ```
-
 
 ```{r}
 dir_logistic$cm <- table(dir_logistic$predicted, df$Central.Air)
 dir_logistic$cm
 ```
 
-
 ```{r}
 mean(dir_logistic$predicted != df$Street[-1])
 ```
 
 Proporcja błędów:
+
 ```{r}
 (dir_logistic$cm[1, 2] + dir_logistic$cm[2, 1]) / sum(dir_logistic$cm)
 mean(dir_logistic$predicted != df$Central.Air)
 ```
 
-
 ```{r}
 df$Year.Built
 ```
-
 
 ```{r}
 train <- df$Year.Built > 1950
@@ -194,7 +172,6 @@ train <- df$Year.Built > 1950
 ```{r}
 min(df$Year.Built)
 ```
-
 
 ```{r}
 train
@@ -205,13 +182,11 @@ df_test <- df[!train,]
 Central.AirT <- df$Central.AirT[!train]
 ```
 
-
 ```{r}
 dir_log_t <- list()
 dir_log_t$fit <-glm(Central.AirT ~ Overall.Qual, data=df, family=binomial, subset = train)
 summary(dir_log_t$fit)
 ```
-
 
 ```{r}
 dir_log_t$probs <- predict(dir_log_t$fit, df_test, type = "response")
@@ -242,10 +217,10 @@ table(dir_log_t$predicted, Central.AirT)
 ```
 
 LDA:
+
 ```{r}
 library(MASS)
 ```
-
 
 ```{r}
 dir_lda <- list()
@@ -253,13 +228,12 @@ dir_lda$fit <- lda(Central.AirT ~ Overall.Qual + Paved.Drive, data = df, subset 
 dir_lda$fit
 ```
 
-
 ```{r}
 dir_lda$predicted <- predict(dir_lda$fit, df_test)
 table(dir_lda$predicted$class, Central.AirT)
 ```
-Wniosek: lepiej w przypadku 0-0, gorzej w przypadku 1-1
 
+Wniosek: lepiej w przypadku 0-0, gorzej w przypadku 1-1
 
 QDA:
 
@@ -269,13 +243,12 @@ dir_qda$fit <- qda(Central.AirT ~ Overall.Qual + Paved.Drive, data = df)
 dir_qda$fit
 ```
 
-
 ```{r}
 dir_qda$predicted <- predict(dir_qda$fit, df_test)
 table(dir_qda$predicted$class, Central.AirT)
 ```
-Lepiej w przypadku 0-0, gorzej 1-1, ale było testowane na zbiorze treningowym.
 
+Lepiej w przypadku 0-0, gorzej 1-1, ale było testowane na zbiorze treningowym.
 
 KNN:
 
@@ -288,7 +261,6 @@ air_knn_1 <- knn(train_set, test_set, Central.AirT_train, k = 1)
 table(air_knn_1, Central.AirT)
 ```
 
-
 Walidacja krzyżowa:
 
 ```{r}
@@ -297,14 +269,12 @@ n <- nrow(df)
 train <- sample(n, n / 2)
 ```
 
-
 ```{r}
 df_lm <- lm(SalePrice ~ Overall.Qual, data = df, subset = train)
 validation_set <- df[-train,]
 mse <- mean((validation_set$SalePrice - predict(df_lm, validation_set))^2)
 mse
 ```
-
 
 ```{r}
 for (i in 2:5) {
@@ -313,7 +283,6 @@ for (i in 2:5) {
   print(mean((validation_set$SalePrice - predict(df_lm_poly, validation_set))^2))
 }
 ```
-
 
 ```{r}
 set.seed(3)
@@ -328,11 +297,9 @@ for (i in 1:degree_max) {
 mse
 ```
 
-
 ```{r}
 plot(mse, xlab = "Stopień wielomianu", ylab = "MSE", type = "b", pch = 20, col = "blue")
 ```
-
 
 Walidacja krzyżowa bez jednego (leave-one-out)
 
@@ -347,11 +314,9 @@ mse <- vapply(1:degree_max, compute_loocv_mse, FUN.VALUE = numeric(1))
 mse
 ```
 
-
 ```{r}
 plot(mse, xlab = "Stopień wielomianu", ylab = "LOOCV MSE", type = "b", pch = 20,col = "blue")
 ```
-
 
 k-krotna walidacja krzyżowa
 
@@ -366,18 +331,15 @@ mse
 
 ```
 
-
 ```{r}
 mse10 <- replicate(10, sapply(1:degree_max, compute_kcv_mse, k = 10))
 mse10
 ```
 
-
 ```{r}
 matplot(mse10, pch = 20, type = "l", xlim = c(1, degree_max),
         xlab = "Stopień wielomianu", ylab = "Walidacyjny MSE")
 ```
-
 
 Bootstrap:
 
@@ -387,35 +349,27 @@ lm_coefs <- function(data, index = 1:nrow(data)) {
 }
 ```
 
-
 ```{r}
 n <- nrow(df)
 lm_coefs(df, sample(n, n, replace = TRUE))
 ```
 
-
 ```{r}
 lm_coefs(df)
 ```
-
 
 ```{r}
 boot(df, lm_coefs, R = 1000)
 ```
 
+```{r}
+```
 
 ```{r}
 ```
 
-
 ```{r}
 ```
 
-
 ```{r}
 ```
-
-
-```{r}
-```
-
