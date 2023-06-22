@@ -23,7 +23,59 @@ names(data)
 
 
 ```{r}
-dim(data)
+dim(df)
+```
+
+```{r}
+preprocess <- function(data) {
+  data <- data[, colSums(is.na(data)) < 0.4 * nrow(data)]
+  
+  # Impute missing values for numerical variables
+  num_vars <- sapply(data, is.numeric)
+  data[num_vars] <- lapply(data[num_vars], function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
+  
+  # Impute missing values for categorical variables
+  cat_vars <- sapply(data, is.factor)
+  data[cat_vars] <- lapply(data[cat_vars], function(x) ifelse(is.na(x), "NA", x))
+  
+  # Convert categorical variables to factors
+  data[cat_vars] <- lapply(data[cat_vars], as.factor)
+  
+  # Normalize numerical variables
+  data[num_vars] <- lapply(data[num_vars], function(x) (x - mean(x)) / sd(x))
+  
+  return(data)
+}
+
+# function that removes columns with only one unqie value 
+remove_unique <- function(data) {
+  data <- data[, sapply(data, function(x) length(unique(x))) > 1]
+  return(data)
+}
+
+library(leaps)
+path <- "./AmesHousing.csv"
+data_clean <- read.csv(path)
+data_clean = preprocess(data_clean)
+data_clean = remove_unique(data_clean)
+data_clean <- na.omit(data_clean)
+n <- nrow(data_clean)
+train <- sample(c(TRUE, FALSE), n, replace = TRUE)
+test <- !train
+prices_vs_v <- regsubsets(SalePrice ~ ., data = data_clean[train,], nvmax = 12, method="forward")
+predict.regsubsets <- function(object, newdata, id, ...) {
+  model_formula <- as.formula(object$formula)
+  mat <- model.matrix(model_formula, newdata)
+  coefs <- coef(object, id = id)
+  mat[, names(coefs)] %*% coefs
+}
+
+prediction_error <- function(i, model, subset) {
+  pred <- predict(model, data_clean[subset,], id = i)
+  mean((data_clean$SalePrice[subset] - pred)^2)
+}
+val_errors <- sapply(1:10, prediction_error, model = prices_vs_v, subset =test)
+val_errors
 ```
 
 
